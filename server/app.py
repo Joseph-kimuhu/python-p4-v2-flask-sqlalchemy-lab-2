@@ -1,10 +1,18 @@
+import os
 from flask import Flask
 from flask_migrate import Migrate
 
-from models import db
+try:
+    # Try relative import first (when running from server directory)
+    from models import db
+except ImportError:
+    # Fall back to absolute import (when running from project root)
+    from server.models import db
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+# Use absolute path to the database in server directory
+db_path = os.path.join(os.path.dirname(__file__), 'instance', 'app.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 migrate = Migrate(app, db)
